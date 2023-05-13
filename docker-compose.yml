@@ -16,7 +16,6 @@ services:
   db:
     build: ./db
     image: "myimage:db"
-    platform: linux/amd64
     ports:
       - 4306:3306
     expose:               # 他のコンテナと通信できるポート番号の指定

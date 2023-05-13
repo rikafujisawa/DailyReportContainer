@@ -38,9 +38,20 @@ RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt
 RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 RUN apt update
 RUN apt -y install temurin-17-jdk=17.0.5.0.0+8
+RUN mkdir /var/www/java
+COPY DailyReportSystem-0.0.1-SNAPSHOT.jar /var/www/java/
+RUN a2enmod proxy
+RUN a2enmod proxy_ajp
+RUN echo "ProxyPass / ajp://localhost:8009/" >> /etc/apache2/apache2.conf
+
 
 # 7. 一般ユーザmyuserの作成およびmyuserでログイン
 RUN apt -y install sudo
 RUN useradd -s /bin/bash -G sudo -m myuser
 RUN echo "myuser:mypass" | chpasswd
 RUN echo "root:rootpass" | chpasswd
+
+# 8. 起動時コマンドの指定
+COPY startup.sh /startup.sh
+RUN chmod 744 /startup.sh
+CMD /startup.sh
